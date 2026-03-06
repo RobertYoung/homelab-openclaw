@@ -8,10 +8,16 @@
     state: present
     update_cache: true
 
-- name: Download and run NodeSource setup script for Node.js {{ openclaw_nodejs_version }}.x
+- name: Download NodeSource setup script
+  ansible.builtin.get_url:
+    url: "https://deb.nodesource.com/setup_{{ openclaw_nodejs_version }}.x"
+    dest: /tmp/nodesource_setup.sh
+    mode: "0755"
+
+- name: Run NodeSource setup script
   become: true
-  ansible.builtin.shell:
-    cmd: "curl -fsSL https://deb.nodesource.com/setup_{{ openclaw_nodejs_version }}.x | bash -"
+  ansible.builtin.command:
+    cmd: bash /tmp/nodesource_setup.sh
     creates: /etc/apt/sources.list.d/nodesource.list
 
 - name: Install Node.js
