@@ -26,6 +26,15 @@
   tags:
     - always
 
+- name: Setup Chromium
+  ansible.builtin.include_tasks:
+    file: chromium.yml
+    apply:
+      tags:
+        - chromium
+  tags:
+    - always
+
 - name: Setup OpenClaw
   ansible.builtin.include_tasks:
     file: openclaw.yml

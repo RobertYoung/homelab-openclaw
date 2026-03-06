@@ -1,0 +1,7 @@
+---
+- name: Install Chromium
+  become: true
+  ansible.builtin.apt:
+    name: chromium
+    state: present
+    update_cache: true
