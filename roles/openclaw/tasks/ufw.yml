@@ -1,0 +1,51 @@
+---
+- name: Install ufw
+  become: true
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+
+- name: Allow SSH (port 22/tcp)
+  become: true
+  community.general.ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+
+- name: Allow HTTPS (port 443/tcp)
+  become: true
+  community.general.ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
+
+# Remove blanket deny first so the allow rule is always inserted before it
+- name: Remove blanket deny for OpenClaw gateway port (ensures correct rule ordering)
+  become: true
+  community.general.ufw:
+    rule: deny
+    port: "{{ openclaw_gateway_port }}"
+    proto: tcp
+    state: disabled
+
+- name: Allow OpenClaw gateway port from Docker bridge (port {{ openclaw_gateway_port }}/tcp)
+  become: true
+  community.general.ufw:
+    rule: allow
+    port: "{{ openclaw_gateway_port }}"
+    proto: tcp
+    src: "{{ openclaw_docker_bridge_subnet }}"
+
+- name: Deny OpenClaw gateway port from all other sources (port {{ openclaw_gateway_port }}/tcp)
+  become: true
+  community.general.ufw:
+    rule: deny
+    port: "{{ openclaw_gateway_port }}"
+    proto: tcp
+
+- name: Enable UFW with default deny policy
+  become: true
+  community.general.ufw:
+    state: enabled
+    default: deny
+    direction: incoming

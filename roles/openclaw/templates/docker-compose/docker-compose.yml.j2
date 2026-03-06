@@ -1,0 +1,13 @@
+services:
+  traefik:
+    image: {{ openclaw_traefik_image }}
+    container_name: {{ openclaw_traefik_container_name }}
+    ports:
+      - "443:443"
+    extra_hosts:
+      - "host.docker.internal:172.18.0.1"
+    volumes:
+      - {{ openclaw_traefik_config_dir }}/traefik.yml:/etc/traefik/traefik.yml:ro
+      - {{ openclaw_traefik_config_dir }}/dynamic:/etc/traefik/dynamic:ro
+      - {{ openclaw_traefik_config_dir }}/certs:/certs:ro
+    restart: unless-stopped

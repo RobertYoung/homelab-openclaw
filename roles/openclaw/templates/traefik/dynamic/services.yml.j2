@@ -1,0 +1,15 @@
+---
+http:
+  routers:
+    openclaw:
+      rule: "Host(`{{ openclaw_service_domain }}`)"
+      entrypoints:
+        - websecure
+      service: openclaw
+      tls: {}
+
+  services:
+    openclaw:
+      loadBalancer:
+        servers:
+          - url: "http://172.18.0.1:{{ openclaw_gateway_port }}"
