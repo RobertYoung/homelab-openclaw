@@ -43,3 +43,12 @@
         - traefik
   tags:
     - always
+
+- name: Setup backup
+  ansible.builtin.include_tasks:
+    file: backup.yml
+    apply:
+      tags:
+        - backup
+  tags:
+    - always

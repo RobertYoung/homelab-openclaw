@@ -11,3 +11,13 @@ openclaw_nodejs_version: "22"
 openclaw_version: "latest"
 openclaw_traefik_image: "traefik:v3.6"
 openclaw_traefik_container_name: traefik
+
+openclaw_backup_cron: "*-*-* 04:00:00"
+openclaw_backup_bucket_name: "home-server-backup.iamrobertyoung.co.uk"
+openclaw_backup_aws_region: eu-west-1
+openclaw_backup_mosquitto_host: mosquitto.local.iamrobertyoung.co.uk
+openclaw_backup_mosquitto_username: home-assistant
+# Secrets (override in playbook from SSM):
+openclaw_backup_aws_access_key: ""
+openclaw_backup_aws_secret_access_key: ""
+openclaw_backup_mosquitto_password: ""

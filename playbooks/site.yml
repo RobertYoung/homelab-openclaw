@@ -60,5 +60,8 @@
 
     - role: openclaw
       tags: [openclaw]
-      # vars:
-      #   openclaw_gateway_token: "{{ lookup('aws_ssm', '/homelab/openclaw/gateway-token', region='eu-west-1') }}"
+      vars:
+        # openclaw_gateway_token: "{{ lookup('aws_ssm', '/homelab/openclaw/gateway-token', region='eu-west-1') }}"
+        openclaw_backup_aws_access_key: "{{ lookup('aws_ssm', '/homelab/aws/access-key', region='eu-west-1') }}"
+        openclaw_backup_aws_secret_access_key: "{{ lookup('aws_ssm', '/homelab/aws/secret-access-key', region='eu-west-1') }}"
+        openclaw_backup_mosquitto_password: "{{ lookup('aws_ssm', '/homelab/mosquitto/home-assistant-password', region='eu-west-1') }}"
