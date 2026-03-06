@@ -28,7 +28,7 @@
     proto: tcp
     state: disabled
 
-- name: Allow OpenClaw gateway port from Docker bridge (port {{ openclaw_gateway_port }}/tcp)
+- name: Allow OpenClaw gateway port from Docker bridge
   become: true
   community.general.ufw:
     rule: allow
@@ -36,7 +36,7 @@
     proto: tcp
     src: "{{ openclaw_docker_bridge_subnet }}"
 
-- name: Deny OpenClaw gateway port from all other sources (port {{ openclaw_gateway_port }}/tcp)
+- name: Deny OpenClaw gateway port from all other sources
   become: true
   community.general.ufw:
     rule: deny
