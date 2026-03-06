@@ -1,0 +1,94 @@
+---
+- name: Create service group - {{ openclaw_service_group }}
+  become: true
+  ansible.builtin.group:
+    name: "{{ openclaw_service_group }}"
+    system: true
+
+- name: Create service user - {{ openclaw_service_user }}
+  become: true
+  ansible.builtin.user:
+    name: "{{ openclaw_service_user }}"
+    group: "{{ openclaw_service_group }}"
+    home: "{{ openclaw_home }}"
+    create_home: true
+    comment: "{{ openclaw_service_user }} service user"
+    shell: /bin/bash
+    system: true
+    groups:
+      - systemd-journal
+    append: true
+
+- name: Enable lingering for {{ openclaw_service_user }}
+  become: true
+  ansible.builtin.command:
+    cmd: "loginctl enable-linger {{ openclaw_service_user }}"
+  changed_when: false
+
+- name: Get UID of {{ openclaw_service_user }}
+  ansible.builtin.command:
+    cmd: "id -u {{ openclaw_service_user }}"
+  register: openclaw_uid
+  changed_when: false
+
+- name: Create XDG runtime directory for {{ openclaw_service_user }}
+  become: true
+  ansible.builtin.file:
+    path: "/run/user/{{ openclaw_uid.stdout }}"
+    state: directory
+    owner: "{{ openclaw_service_user }}"
+    group: "{{ openclaw_service_group }}"
+    mode: "0700"
+
+- name: Configure XDG_RUNTIME_DIR and DBUS_SESSION_BUS_ADDRESS in .bashrc
+  become: true
+  ansible.builtin.blockinfile:
+    path: "{{ openclaw_home }}/.bashrc"
+    create: true
+    owner: "{{ openclaw_service_user }}"
+    group: "{{ openclaw_service_group }}"
+    mode: "0644"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - DBus config"
+    block: |
+      export XDG_RUNTIME_DIR=/run/user/$(id -u)
+      if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+        export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
+      fi
+
+- name: Create traefik certs directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ openclaw_traefik_config_dir }}/certs"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Copy TLS certificate into certs directory
+  become: true
+  ansible.builtin.copy:
+    src: "/etc/ssl/certs/{{ openclaw_service_domain }}.crt"
+    dest: "{{ openclaw_traefik_config_dir }}/certs/{{ openclaw_service_domain }}.crt"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Copy TLS key into certs directory
+  become: true
+  ansible.builtin.copy:
+    src: "/etc/ssl/private/{{ openclaw_service_domain }}.pem"
+    dest: "{{ openclaw_traefik_config_dir }}/certs/{{ openclaw_service_domain }}.pem"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Create openclaw config directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ openclaw_home }}/.openclaw"
+    state: directory
+    mode: "0750"
+    owner: "{{ openclaw_service_user }}"
+    group: "{{ openclaw_service_group }}"

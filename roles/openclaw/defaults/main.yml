@@ -1,0 +1,13 @@
+---
+openclaw_service_name: openclaw
+openclaw_service_user: openclaw
+openclaw_service_group: openclaw
+openclaw_gateway_port: 18789
+openclaw_docker_bridge_subnet: "172.18.0.0/16"
+openclaw_service_domain: "openclaw.{{ domain }}"
+openclaw_home: /var/lib/openclaw
+openclaw_traefik_config_dir: /etc/traefik
+openclaw_nodejs_version: "22"
+openclaw_version: "latest"
+openclaw_traefik_image: "traefik:v3.6"
+openclaw_traefik_container_name: traefik

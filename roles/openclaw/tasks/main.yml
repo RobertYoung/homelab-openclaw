@@ -1,0 +1,45 @@
+---
+- name: Setup system
+  ansible.builtin.include_tasks:
+    file: setup.yml
+    apply:
+      tags:
+        - setup
+  tags:
+    - always
+
+- name: Setup UFW firewall
+  ansible.builtin.include_tasks:
+    file: ufw.yml
+    apply:
+      tags:
+        - ufw
+  tags:
+    - always
+
+- name: Setup Node.js
+  ansible.builtin.include_tasks:
+    file: nodejs.yml
+    apply:
+      tags:
+        - nodejs
+  tags:
+    - always
+
+- name: Setup OpenClaw
+  ansible.builtin.include_tasks:
+    file: openclaw.yml
+    apply:
+      tags:
+        - openclaw
+  tags:
+    - always
+
+- name: Setup Traefik
+  ansible.builtin.include_tasks:
+    file: traefik.yml
+    apply:
+      tags:
+        - traefik
+  tags:
+    - always

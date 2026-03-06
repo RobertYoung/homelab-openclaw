@@ -1,0 +1,64 @@
+---
+- name: OpenClaw server configuration
+  hosts: openclaw
+  vars:
+    hostname: openclaw
+    domain: local.iamrobertyoung.co.uk
+    fqdn: "{{ hostname }}.{{ domain }}"
+
+  roles:
+    - role: configure-system
+      tags: [configure-system]
+      vars:
+        configure_system_hostname: "{{ fqdn }}"
+
+    - role: shell
+      tags: [shell]
+      vars:
+        shell_hostname: "{{ hostname }}"
+        shell_user: noxious
+        shell_home_directory: /home/noxious
+
+    - role: shell
+      tags: [shell]
+      vars:
+        shell_hostname: "{{ hostname }}"
+        shell_user: root
+        shell_home_directory: /root
+        shell_show_pretty_info: false
+
+    - role: docker
+      tags: [docker]
+
+    - role: step-ca-client
+      tags: [step-ca-client]
+      vars:
+        step_ca_client_provisioner_password: "{{ lookup('aws_ssm', '/homelab/step-ca/ansible-password', region='eu-west-1') }}"
+        step_ca_client_cert_not_after: "168h" # 7 days
+        step_ca_client_post_renew_commands:
+          - "mkdir -p /etc/traefik/certs"
+          - "cp /etc/ssl/certs/{{ fqdn }}.crt /etc/traefik/certs/"
+          - "cp /etc/ssl/private/{{ fqdn }}.pem /etc/traefik/certs/"
+          - "docker kill --signal=HUP traefik || echo 'Traefik not running, skipping HUP signal'"
+
+    - role: telegraf
+      tags: [telegraf]
+      vars:
+        telegraf_influxdb_url: "https://influxdb.local.iamrobertyoung.co.uk"
+        telegraf_influxdb_port: 8086
+        telegraf_influxdb_organisation: "0dd8df669872ba9e"
+        telegraf_influxdb_token: "{{ lookup('aws_ssm', '/homelab/influxdb/token', region='eu-west-1') }}"
+        telegraf_influxdb_bucket: "home-server"
+
+    - role: syslog
+      tags: [syslog]
+      vars:
+        syslog_fqdn: "{{ fqdn }}"
+
+    - role: wazuh-agent
+      tags: [wazuh-agent]
+
+    - role: openclaw
+      tags: [openclaw]
+      # vars:
+      #   openclaw_gateway_token: "{{ lookup('aws_ssm', '/homelab/openclaw/gateway-token', region='eu-west-1') }}"

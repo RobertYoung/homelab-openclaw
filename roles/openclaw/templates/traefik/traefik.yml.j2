@@ -1,0 +1,18 @@
+---
+api:
+  dashboard: false
+  insecure: false
+
+entryPoints:
+  websecure:
+    address: ":443"
+
+providers:
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
+log:
+  level: INFO
+
+accessLog: {}

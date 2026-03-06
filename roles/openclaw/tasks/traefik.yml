@@ -1,0 +1,68 @@
+---
+- name: Create traefik config directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ openclaw_traefik_config_dir }}"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Create traefik dynamic config directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ openclaw_traefik_config_dir }}/dynamic"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Create traefik static config
+  become: true
+  ansible.builtin.template:
+    src: "templates/traefik/traefik.yml.j2"
+    dest: "{{ openclaw_traefik_config_dir }}/traefik.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart traefik
+
+- name: Create traefik TLS dynamic config
+  become: true
+  ansible.builtin.template:
+    src: "templates/traefik/dynamic/tls.yml.j2"
+    dest: "{{ openclaw_traefik_config_dir }}/dynamic/tls.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart traefik
+
+- name: Create traefik services dynamic config
+  become: true
+  ansible.builtin.template:
+    src: "templates/traefik/dynamic/services.yml.j2"
+    dest: "{{ openclaw_traefik_config_dir }}/dynamic/services.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart traefik
+
+- name: Template docker-compose.yml for traefik
+  become: true
+  ansible.builtin.template:
+    src: "templates/docker-compose/docker-compose.yml.j2"
+    dest: "{{ openclaw_traefik_config_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart traefik
+
+- name: Template traefik systemd service
+  become: true
+  ansible.builtin.template:
+    src: "templates/traefik/traefik.service.j2"
+    dest: /etc/systemd/system/traefik.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart traefik

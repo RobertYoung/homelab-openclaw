@@ -1,0 +1,8 @@
+---
+- name: Install openclaw globally via pnpm
+  become: true
+  ansible.builtin.command:
+    cmd: "pnpm install -g openclaw@{{ openclaw_version }}"
+  environment:
+    PNPM_HOME: /usr/local/bin
+  changed_when: true
