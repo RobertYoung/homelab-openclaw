@@ -17,6 +17,7 @@
     system: true
     groups:
       - systemd-journal
+      - docker
     append: true
 
 - name: Enable lingering for {{ openclaw_service_user }}
@@ -54,6 +55,19 @@
       if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
         export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
       fi
+
+- name: Configure PNPM environment in .bashrc for {{ openclaw_service_user }}
+  become: true
+  ansible.builtin.blockinfile:
+    path: "{{ openclaw_home }}/.bashrc"
+    create: true
+    owner: "{{ openclaw_service_user }}"
+    group: "{{ openclaw_service_group }}"
+    mode: "0644"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - pnpm config"
+    block: |
+      export PNPM_HOME="{{ openclaw_pnpm_home }}"
+      export PATH="$PNPM_HOME:$PATH"
 
 - name: Create traefik certs directory
   become: true
