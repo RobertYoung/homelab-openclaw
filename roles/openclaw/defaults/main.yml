@@ -9,6 +9,7 @@ openclaw_home: /var/lib/openclaw
 openclaw_traefik_config_dir: /etc/traefik
 openclaw_nodejs_version: "22"
 openclaw_version: "latest"
+openclaw_pnpm_home: "{{ openclaw_home }}/.local/share/pnpm"
 openclaw_traefik_image: "traefik:v3.6"
 openclaw_traefik_container_name: traefik
 
